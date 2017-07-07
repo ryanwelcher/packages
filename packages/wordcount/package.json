@@ -1,0 +1,15 @@
+{
+  "name": "@wordpress/wordcount",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/WordPress/packages.git"
+  },
+  "description": "WordPress Word Count Utility",
+  "main": "build/index.js",
+  "module": "build-module/index.js",
+  "browser": "build-browser/index.js",
+  "author": "WordPress",
+  "license": "GPL-2.0+",
+  "dependencies": {}
+}
