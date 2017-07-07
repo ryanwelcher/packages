@@ -86,13 +86,11 @@ describe( 'WordCounter', () => {
 	const types = [ 'words', 'characters_excluding_spaces', 'characters_including_spaces' ];
 	const counter = new WordCounter;
 
-	dataProvider.forEach( ( item ) => {
-		types.forEach( ( type ) => {
+	dataProvider.forEach( item => {
+		types.forEach( type => {
 			test( item.message + ' (' + type + ')', () => {
-				let words = counter.count( item.string, type );
-				expect( words ).toBe( item[ type ] );
+				expect( counter.count( item.string, type ) ).toBe( item[ type ] );
 			});
 		});
 	});
-
 });
