@@ -33,7 +33,7 @@
  *
  * @return void
  */
-export function WordCounter( settings ) {
+function WordCounter( settings ) {
 	var key,
 		shortcodes;
 
@@ -143,7 +143,7 @@ WordCounter.prototype.settings = {
  *
  * @return {Number} The number of items counted.
  */
-export default WordCounter.prototype.count = function( text, type ) {
+WordCounter.prototype.count = function( text, type ) {
 	var count = 0;
 
 	// Use default type if none was provided.
@@ -202,3 +202,15 @@ export default WordCounter.prototype.count = function( text, type ) {
 
 	return count;
 };
+
+/**
+ * Create a simpler API
+ * @param text
+ * @param type
+ * @param settings
+ * @returns {Number}
+ */
+export function wordCount( text, type, settings) {
+	const counter = new WordCounter( settings );
+	return counter.count( text, type );
+}

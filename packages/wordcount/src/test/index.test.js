@@ -1,7 +1,7 @@
 /**
  * Internal Dependencies
  */
-import { WordCounter } from '../';
+import {wordCount} from '../';
 
 
 describe( 'WordCounter', () => {
@@ -84,12 +84,12 @@ describe( 'WordCounter', () => {
 	];
 
 	const types = [ 'words', 'characters_excluding_spaces', 'characters_including_spaces' ];
-	const counter = new WordCounter;
 
 	dataProvider.forEach( item => {
 		types.forEach( type => {
+			const count = wordCount( item.string, type );
 			test( item.message + ' (' + type + ')', () => {
-				expect( counter.count( item.string, type ) ).toBe( item[ type ] );
+				expect( count ).toBe( item[ type ] );
 			});
 		});
 	});
