@@ -143,7 +143,7 @@ WordCounter.prototype.settings = {
  *
  * @return {Number} The number of items counted.
  */
-WordCounter.prototype.count = function( text, type ) {
+export default WordCounter.prototype.count = function( text, type ) {
 	var count = 0;
 
 	// Use default type if none was provided.
