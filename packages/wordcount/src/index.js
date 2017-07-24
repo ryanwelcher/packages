@@ -1,10 +1,15 @@
 /**
  * Word counting utility
  *
- * @namespace wp.utils.wordcounter
- * @memberof  wp.utils
+ * Counts the number of words (or other specified type) in the specified text.
  *
- * @class
+ * @summary  Count the number of elements in a text.
+ *
+ * @since    2.6.0
+ * @memberof wp.utils.wordcounter
+ *
+ * @param {String}  text Text to count elements in.
+ * @param {String}  type Optional. Specify type to use.
  *
  * @param {Object} settings                                   Optional. Key-value object containing overrides for
  *                                                            settings.
@@ -31,123 +36,108 @@
  * @param {Array}  settings.l10n.shortcodes                   Optional. Array of shortcodes that should be removed
  *                                                            from the text.
  *
- * @return void
+ * @return {Number} The number of items counted.
  */
-function WordCounter( settings ) {
-	var key,
-		shortcodes;
+export function count( text, type, settings ) {
+	let count = 0;
+	let shortcodes;
+	const defaultSettings  = {
+		HTMLRegExp: /<\/?[a-z][^>]*?>/gi,
+		HTMLcommentRegExp: /<!--[\s\S]*?-->/g,
+		spaceRegExp: /&nbsp;|&#160;/gi,
+		HTMLEntityRegExp: /&\S+?;/g,
+
+		// \u2014 = em-dash
+		connectorRegExp: /--|\u2014/g,
+
+		// Characters to be removed from input text.
+		removeRegExp: new RegExp([
+			'[',
+
+			// Basic Latin (extract)
+			'\u0021-\u0040\u005B-\u0060\u007B-\u007E',
+
+			// Latin-1 Supplement (extract)
+			'\u0080-\u00BF\u00D7\u00F7',
+
+			/*
+			 * The following range consists of:
+			 * General Punctuation
+			 * Superscripts and Subscripts
+			 * Currency Symbols
+			 * Combining Diacritical Marks for Symbols
+			 * Letterlike Symbols
+			 * Number Forms
+			 * Arrows
+			 * Mathematical Operators
+			 * Miscellaneous Technical
+			 * Control Pictures
+			 * Optical Character Recognition
+			 * Enclosed Alphanumerics
+			 * Box Drawing
+			 * Block Elements
+			 * Geometric Shapes
+			 * Miscellaneous Symbols
+			 * Dingbats
+			 * Miscellaneous Mathematical Symbols-A
+			 * Supplemental Arrows-A
+			 * Braille Patterns
+			 * Supplemental Arrows-B
+			 * Miscellaneous Mathematical Symbols-B
+			 * Supplemental Mathematical Operators
+			 * Miscellaneous Symbols and Arrows
+			 */
+			'\u2000-\u2BFF',
+
+			// Supplemental Punctuation
+			'\u2E00-\u2E7F',
+			']'
+		].join(''), 'g'),
+
+		// Remove UTF-16 surrogate points, see https://en.wikipedia.org/wiki/UTF-16#U.2BD800_to_U.2BDFFF
+		astralRegExp: /[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
+		wordsRegExp: /\S\s+/g,
+		characters_excluding_spacesRegExp: /\S/g,
+
+		/*
+		 * Match anything that is not a formatting character, excluding:
+		 * \f = form feed
+		 * \n = new line
+		 * \r = carriage return
+		 * \t = tab
+		 * \v = vertical tab
+		 * \u00AD = soft hyphen
+		 * \u2028 = line separator
+		 * \u2029 = paragraph separator
+		 */
+		characters_including_spacesRegExp: /[^\f\n\r\t\v\u00AD\u2028\u2029]/g,
+		l10n: {
+			type: 'words'
+		}
+	};
 
 	// Apply provided settings to object settings.
 	if ( settings ) {
-		for ( key in settings ) {
+		for ( let key in settings ) {
 
 			// Only apply valid settings.
 			if ( settings.hasOwnProperty( key ) ) {
-				this.settings[ key ] = settings[ key ];
+				defaultSettings[ key ] = settings[ key ];
 			}
 		}
 	}
 
-	shortcodes = this.settings.l10n.shortcodes;
+	shortcodes = defaultSettings.l10n.shortcodes || {};
 
 	// If there are any localization shortcodes, add this as type in the settings.
 	if ( shortcodes && shortcodes.length ) {
-		this.settings.shortcodesRegExp = new RegExp( '\\[\\/?(?:' + shortcodes.join( '|' ) + ')[^\\]]*?\\]', 'g' );
+		defaultSettings.shortcodesRegExp = new RegExp( '\\[\\/?(?:' + shortcodes.join( '|' ) + ')[^\\]]*?\\]', 'g' );
 	}
-}
 
-// Default settings.
-WordCounter.prototype.settings = {
-	HTMLRegExp: /<\/?[a-z][^>]*?>/gi,
-	HTMLcommentRegExp: /<!--[\s\S]*?-->/g,
-	spaceRegExp: /&nbsp;|&#160;/gi,
-	HTMLEntityRegExp: /&\S+?;/g,
-
-	// \u2014 = em-dash
-	connectorRegExp: /--|\u2014/g,
-
-	// Characters to be removed from input text.
-	removeRegExp: new RegExp( [
-		'[',
-
-		// Basic Latin (extract)
-		'\u0021-\u0040\u005B-\u0060\u007B-\u007E',
-
-		// Latin-1 Supplement (extract)
-		'\u0080-\u00BF\u00D7\u00F7',
-
-		/*
-		 * The following range consists of:
-		 * General Punctuation
-		 * Superscripts and Subscripts
-		 * Currency Symbols
-		 * Combining Diacritical Marks for Symbols
-		 * Letterlike Symbols
-		 * Number Forms
-		 * Arrows
-		 * Mathematical Operators
-		 * Miscellaneous Technical
-		 * Control Pictures
-		 * Optical Character Recognition
-		 * Enclosed Alphanumerics
-		 * Box Drawing
-		 * Block Elements
-		 * Geometric Shapes
-		 * Miscellaneous Symbols
-		 * Dingbats
-		 * Miscellaneous Mathematical Symbols-A
-		 * Supplemental Arrows-A
-		 * Braille Patterns
-		 * Supplemental Arrows-B
-		 * Miscellaneous Mathematical Symbols-B
-		 * Supplemental Mathematical Operators
-		 * Miscellaneous Symbols and Arrows
-		 */
-		'\u2000-\u2BFF',
-
-		// Supplemental Punctuation
-		'\u2E00-\u2E7F',
-		']'
-	].join( '' ), 'g' ),
-
-	// Remove UTF-16 surrogate points, see https://en.wikipedia.org/wiki/UTF-16#U.2BD800_to_U.2BDFFF
-	astralRegExp: /[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
-	wordsRegExp: /\S\s+/g,
-	characters_excluding_spacesRegExp: /\S/g,
-
-	/*
-	 * Match anything that is not a formatting character, excluding:
-	 * \f = form feed
-	 * \n = new line
-	 * \r = carriage return
-	 * \t = tab
-	 * \v = vertical tab
-	 * \u00AD = soft hyphen
-	 * \u2028 = line separator
-	 * \u2029 = paragraph separator
-	 */
-	characters_including_spacesRegExp: /[^\f\n\r\t\v\u00AD\u2028\u2029]/g,
-	l10n: window.wordCountL10n || {}
-};
-
-/**
- * Counts the number of words (or other specified type) in the specified text.
- *
- * @summary  Count the number of elements in a text.
- *
- * @since    2.6.0
- * @memberof wp.utils.wordcounter
- *
- * @param {String}  text Text to count elements in.
- * @param {String}  type Optional. Specify type to use.
- *
- * @return {Number} The number of items counted.
- */
-WordCounter.prototype.count = function( text, type ) {
-	var count = 0;
+	// do the counting;
 
 	// Use default type if none was provided.
-	type = type || this.settings.l10n.type;
+	type = type || defaultSettings.l10n.type;
 
 	// Sanitize type to one of three possibilities: 'words', 'characters_excluding_spaces' or 'characters_including_spaces'.
 	if ( type !== 'characters_excluding_spaces' && type !== 'characters_including_spaces' ) {
@@ -159,58 +149,45 @@ WordCounter.prototype.count = function( text, type ) {
 		text = text + '\n';
 
 		// Replace all HTML with a new-line.
-		text = text.replace( this.settings.HTMLRegExp, '\n' );
+		text = text.replace( defaultSettings.HTMLRegExp, '\n' );
 
 		// Remove all HTML comments.
-		text = text.replace( this.settings.HTMLcommentRegExp, '' );
+		text = text.replace( defaultSettings.HTMLcommentRegExp, '' );
 
 		// If a shortcode regular expression has been provided use it to remove shortcodes.
-		if ( this.settings.shortcodesRegExp ) {
-			text = text.replace( this.settings.shortcodesRegExp, '\n' );
+		if ( defaultSettings.shortcodesRegExp ) {
+			text = text.replace( defaultSettings.shortcodesRegExp, '\n' );
 		}
 
 		// Normalize non-breaking space to a normal space.
-		text = text.replace( this.settings.spaceRegExp, ' ' );
+		text = text.replace( defaultSettings.spaceRegExp, ' ' );
 
 		if ( type === 'words' ) {
 
 			// Remove HTML Entities.
-			text = text.replace( this.settings.HTMLEntityRegExp, '' );
+			text = text.replace( defaultSettings.HTMLEntityRegExp, '' );
 
 			// Convert connectors to spaces to count attached text as words.
-			text = text.replace( this.settings.connectorRegExp, ' ' );
+			text = text.replace( defaultSettings.connectorRegExp, ' ' );
 
 			// Remove unwanted characters.
-			text = text.replace( this.settings.removeRegExp, '' );
+			text = text.replace( defaultSettings.removeRegExp, '' );
 		} else {
 
 			// Convert HTML Entities to "a".
-			text = text.replace( this.settings.HTMLEntityRegExp, 'a' );
+			text = text.replace( defaultSettings.HTMLEntityRegExp, 'a' );
 
 			// Remove surrogate points.
-			text = text.replace( this.settings.astralRegExp, 'a' );
+			text = text.replace( defaultSettings.astralRegExp, 'a' );
 		}
 
 		// Match with the selected type regular expression to count the items.
-		text = text.match( this.settings[ type + 'RegExp' ] );
+		text = text.match( defaultSettings[ type + 'RegExp' ] );
 
 		// If we have any matches, set the count to the number of items found.
 		if ( text ) {
 			count = text.length;
 		}
 	}
-
 	return count;
-};
-
-/**
- * Create a simpler API
- * @param text
- * @param type
- * @param settings
- * @returns {Number}
- */
-export function wordCount( text, type, settings) {
-	const counter = new WordCounter( settings );
-	return counter.count( text, type );
 }

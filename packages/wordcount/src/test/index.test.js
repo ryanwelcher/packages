@@ -1,8 +1,15 @@
 /**
  * Internal Dependencies
  */
-import {wordCount} from '../';
+import {count} from '../';
 
+const mockData = {
+	'l10n': {
+		'shortcodes': [
+			'shortcode'
+		]
+	}
+};
 
 describe( 'WordCounter', () => {
 
@@ -49,9 +56,6 @@ describe( 'WordCounter', () => {
 				characters_excluding_spaces: 14,
 				characters_including_spaces: 14
 			},
-
-			/**
-			 * This test fails as it relies on the l10n object. Commenting out for now.
 			{
 				message: 'Shortcodes.',
 				string: 'one [shortcode attribute="value"]two[/shortcode]three',
@@ -59,7 +63,6 @@ describe( 'WordCounter', () => {
 				characters_excluding_spaces: 11,
 				characters_including_spaces: 12
 			},
-			 **/
 			{
 				message: 'Astrals.',
 				string: '\uD83D\uDCA9',
@@ -87,9 +90,9 @@ describe( 'WordCounter', () => {
 
 	dataProvider.forEach( item => {
 		types.forEach( type => {
-			const count = wordCount( item.string, type );
+			const result = count( item.string, type, mockData );
 			test( item.message + ' (' + type + ')', () => {
-				expect( count ).toBe( item[ type ] );
+				expect( result ).toBe( item[ type ] );
 			});
 		});
 	});
