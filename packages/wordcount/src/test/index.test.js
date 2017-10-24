@@ -1,7 +1,8 @@
 /**
  * Internal Dependencies
  */
-import {count} from '../';
+
+import {WordCounter} from '../';
 
 const mockData = {
 	'l10n': {
@@ -90,7 +91,7 @@ describe( 'WordCounter', () => {
 
 	dataProvider.forEach( item => {
 		types.forEach( type => {
-			const result = count( item.string, type, mockData );
+			const result = WordCounter.count( item.string, type, mockData );
 			test( item.message + ' (' + type + ')', () => {
 				expect( result ).toBe( item[ type ] );
 			});
