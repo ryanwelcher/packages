@@ -1,7 +1,17 @@
 import _ from 'lodash';
+import {
+	stripHTMLEntities,
+	stripConnectors,
+	stripRemoveables,
+	stripHTMLComments,
+	stripTags,
+	stripShortcodes,
+	stripSpaces,
+	transposeHTMLEntitiesToCountableChars,
+	transpostAstralsToCountableChar
+} from "./stripCharacters";
 
-let wordCount = 0;
-let shortcodes;
+
 const defaultSettings  = {
 	HTMLRegExp: /<\/?[a-z][^>]*?>/gi,
 	HTMLcommentRegExp: /<!--[\s\S]*?-->/g,
@@ -79,109 +89,98 @@ const defaultSettings  = {
 
 
 /**
- * Word counting utility
+ * Private function to manage the settings.
  *
- * Counts the number of words (or other specified type) in the specified text.
+ * @param type
+ * @param userSettings
+ * @returns {void|Object|*}
+ */
+function loadSettings( type, userSettings ) {
+	let settings = _.extend( defaultSettings, userSettings  );
+
+	settings.shortcodes = settings.l10n.shortcodes || {};
+
+	if ( settings.shortcodes && settings.shortcodes.length ) {
+		settings.shortcodesRegExp = new RegExp( '\\[\\/?(?:' + settings.shortcodes.join( '|' ) + ')[^\\]]*?\\]', 'g' );
+	}
+
+	settings.type = type || settings.l10n.type;
+
+	if ( settings.type !== 'characters_excluding_spaces' && settings.type !== 'characters_including_spaces' ) {
+		settings.type = 'words';
+	}
+
+	return settings;
+}
+
+/**
+ * Match the regex for the type 'words'
+ * @param text
+ * @param settings
+ * @param regex
+ * @returns {Array|{index: number, input: string}}
+ */
+function matchWords( text, settings, regex ) {
+	text = stripRemoveables(
+			stripConnectors(
+				stripHTMLEntities(
+					stripSpaces(
+						stripShortcodes(
+							stripHTMLComments(
+								stripTags( text, settings ),
+							settings ),
+						settings ),
+					settings),
+				settings),
+			settings ),
+		settings);
+	text = text + '\n';
+	return text.match( regex );
+}
+
+
+/**
+ * Match the regex for either 'characters_excluding_spaces' or 'characters_including_spaces'
+ * @param text
+ * @param settings
+ * @param regex
+ * @returns {Array|{index: number, input: string}}
+ */
+function matchCharacters( text, settings, regex ) {
+	text = transposeHTMLEntitiesToCountableChars(
+			transpostAstralsToCountableChar(
+					stripSpaces(
+						stripShortcodes(
+							stripHTMLComments(
+								stripTags( text, settings ),
+							settings ),
+						settings ),
+					settings),
+				settings ),
+			settings );
+	text = text + '\n';
+	return text.match( regex );
+}
+
+
+/**
+ * Count some words.
  *
- * @summary  Count the number of elements in a text.
+ * @param {String} text
+ * @param {String} type
+ * @param {Object}  userSettings
  *
- * @since    2.6.0
- *
- * @param {String}  text Text to count elements in.
- * @param {String}  type Optional. Specify type to use.
- *
- * @param {Object} userSettings                                   Optional. Key-value object containing overrides for
- *                                                                          userSettings.
- * @param {RegExp} userSettings.HTMLRegExp                        Optional. Regular expression to find HTML elements.
- * @param {RegExp} userSettings.HTMLcommentRegExp                 Optional. Regular expression to find HTML comments.
- * @param {RegExp} userSettings.spaceRegExp                       Optional. Regular expression to find irregular space
- *                                                                          characters.
- * @param {RegExp} userSettings.HTMLEntityRegExp                  Optional. Regular expression to find HTML entities.
- * @param {RegExp} userSettings.connectorRegExp                   Optional. Regular expression to find connectors that
- *                                                                          split words.
- * @param {RegExp} userSettings.removeRegExp                      Optional. Regular expression to find remove unwanted
- *                                                                          characters to reduce false-positives.
- * @param {RegExp} userSettings.astralRegExp                      Optional. Regular expression to find unwanted
- *                                                                          characters when searching for non-words.
- * @param {RegExp} userSettings.wordsRegExp                       Optional. Regular expression to find words by spaces.
- * @param {RegExp} userSettings.characters_excluding_spacesRegExp Optional. Regular expression to find characters which
- *                                                                          are non-spaces.
- * @param {RegExp} userSettings.characters_including_spacesRegExp Optional. Regular expression to find characters
- *                                                                          including spaces.
- * @param {RegExp} userSettings.shortcodesRegExp                  Optional. Regular expression to find shortcodes.
- * @param {Object} userSettings.l10n                              Optional. Localization object containing specific
- *                                                                          configuration for the current localization.
- * @param {String} userSettings.l10n.type                         Optional. Method of finding words to count.
- * @param {Array}  userSettings.l10n.shortcodes                   Optional. Array of shortcodes that should be removed
- *                                                                          from the text.
- *
- * @return {Number} The number of items counted.
+ * @returns {Number}
  */
 export function count( text, type, userSettings ) {
-
-	const settings = _.extend( defaultSettings, userSettings  );
-
-	shortcodes = settings.l10n.shortcodes || {};
-
-	// If there are any localization shortcodes, add this as type in the settings.
-	if ( shortcodes && shortcodes.length ) {
-		settings.shortcodesRegExp = new RegExp( '\\[\\/?(?:' + shortcodes.join( '|' ) + ')[^\\]]*?\\]', 'g' );
-	}
-
-	// do the counting;
-
-	// Use default type if none was provided.
-	type = type || settings.l10n.type;
-
-	// Sanitize type to one of three possibilities: 'words', 'characters_excluding_spaces' or 'characters_including_spaces'.
-	if ( type !== 'characters_excluding_spaces' && type !== 'characters_including_spaces' ) {
-		type = 'words';
-	}
-
-	// If we have any text at all.
+	const settings = loadSettings( type, userSettings );
 	if ( text ) {
-		text = text + '\n';
-
-		// Replace all HTML with a new-line.
-		text = text.replace( settings.HTMLRegExp, '\n' );
-
-		// Remove all HTML comments.
-		text = text.replace( settings.HTMLcommentRegExp, '' );
-
-		// If a shortcode regular expression has been provided use it to remove shortcodes.
-		if ( settings.shortcodesRegExp ) {
-			text = text.replace( settings.shortcodesRegExp, '\n' );
-		}
-
-		// Normalize non-breaking space to a normal space.
-		text = text.replace( settings.spaceRegExp, ' ' );
-
-		if ( type === 'words' ) {
-
-			// Remove HTML Entities.
-			text = text.replace( settings.HTMLEntityRegExp, '' );
-
-			// Convert connectors to spaces to count attached text as words.
-			text = text.replace( settings.connectorRegExp, ' ' );
-
-			// Remove unwanted characters.
-			text = text.replace( settings.removeRegExp, '' );
+		let matchRegExp = settings[ type +'RegExp'];
+		if ( 'words' === settings.type ) {
+			return matchWords( text, settings, matchRegExp ).length;
 		} else {
-
-			// Convert HTML Entities to "a".
-			text = text.replace( settings.HTMLEntityRegExp, 'a' );
-
-			// Remove surrogate points.
-			text = text.replace( settings.astralRegExp, 'a' );
-		}
-
-		// Match with the selected type regular expression to count the items.
-		text = text.match( settings[ type + 'RegExp' ] );
-
-		// If we have any matches, set the count to the number of items found.
-		if ( text ) {
-			wordCount = text.length;
+			return matchCharacters( text, settings, matchRegExp ).length;
 		}
 	}
-	return wordCount;
 }
+
