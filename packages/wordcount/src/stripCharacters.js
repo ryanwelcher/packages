@@ -25,10 +25,7 @@ export function stripHTMLComments( text, settings ) {
  * @returns {string|*|XML|void}
  */
 export function stripShortcodes( text,  settings  ) {
-	if ( settings.shortcodesRegExp ) {
-		return text.replace( settings.shortcodesRegExp, '\n' );
-	}
-	return text;
+	return text.replace( settings.shortcodesRegExp, '\n' );
 }
 
 /**
