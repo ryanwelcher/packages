@@ -1,4 +1,4 @@
-import { extend, flow } from 'lodash';
+import { extend, flow  } from 'lodash';
 import { defaultSettings } from './defaultSettings'
 import stripTags from './stripTags';
 import transposeAstralsToCountableChar from './transposeAstralsToCountableChar';
@@ -68,19 +68,15 @@ export const WordCounter = {
 	 * @returns {Array|{index: number, input: string}}
 	 */
 	matchWords: function( text, regex ) {
-		text = this.stripRemovables(
-			this.stripConnectors(
-				this.stripHTMLEntities(
-					this.stripSpaces(
-						this.stripShortcodes(
-							this.stripHTMLComments(
-								this.stripTags( text ),
-								),
-							),
-						),
-					),
-				 ),
-			);
+		text = flow(
+			this.stripTags,
+			this.stripHTMLComments,
+			this.stripShortcodes,
+			this.stripSpaces,
+			this.stripHTMLEntities,
+			this.stripConnectors,
+			this.stripRemovables,
+		).bind(this)( text );
 		text = text + '\n';
 		return text.match( regex );
 	},
@@ -92,17 +88,14 @@ export const WordCounter = {
 	 * @returns {Array|{index: number, input: string}}
 	 */
 	matchCharacters: function( text, regex ) {
-		text = this.transposeHTMLEntitiesToCountableChars(
-				this.transposeAstralsToCountableChar(
-					this.stripSpaces(
-						this.stripShortcodes(
-							this.stripHTMLComments(
-								this.stripTags( text ),
-							),
-						),
-					),
-				),
-			 );
+		text = flow(
+			this.stripTags,
+			this.stripHTMLComments,
+			this.stripShortcodes,
+			this.stripSpaces,
+			this.transposeAstralsToCountableChar,
+			this.transposeHTMLEntitiesToCountableChars,
+		).bind(this)( text );
 		text = text + '\n';
 		return text.match( regex );
 	},
