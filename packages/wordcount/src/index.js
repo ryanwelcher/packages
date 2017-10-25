@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { extend, flow } from 'lodash';
 import { defaultSettings } from './defaultSettings'
 import stripTags from './stripTags';
 import transposeAstralsToCountableChar from './transposeAstralsToCountableChar';
@@ -20,7 +20,7 @@ import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCoun
  * @returns {void|Object|*}
  */
 function loadSettings( type, userSettings ) {
-	let settings = _.extend( defaultSettings, userSettings  );
+	let settings = extend( defaultSettings, userSettings  );
 
 	settings.shortcodes = settings.l10n.shortcodes || {};
 
