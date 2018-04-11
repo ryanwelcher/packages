@@ -1,7 +1,14 @@
 {
-  "lerna": "2.0.0",
-  "packages": [
-    "packages/*"
-  ],
-  "version": "independent"
+	"lerna": "2.9.0",
+	"commands": {
+		"publish": {
+			"ignore": [
+				"**/test/*.js"
+			]
+		}
+	},
+	"packages": [
+		"packages/*"
+	],
+	"version": "independent"
 }
