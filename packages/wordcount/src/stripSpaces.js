@@ -4,6 +4,8 @@
  * @param {Object} settings
  * @returns {string|*|XML|void}
  */
-export default function ( text ) {
-	return text.replace( this.settings.spaceRegExp, ' ' );
+export default function ( settings, text  ) {
+	if ( settings.spaceRegExp ) {
+		return text.replace(settings.spaceRegExp, ' ');
+	}
 }

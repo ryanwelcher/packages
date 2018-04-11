@@ -5,6 +5,9 @@
  * @param {Object} settings
  * @returns {string|*|XML|void}
  */
-export default function ( text ) {
-	return text.replace( this.settings.removeRegExp, '' );
+export default function ( settings, text ) {
+	if ( settings.removeRegExp ) {
+		return text.replace(settings.removeRegExp, '');
+	}
+	return text;
 }

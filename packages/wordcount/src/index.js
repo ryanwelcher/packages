@@ -36,6 +36,48 @@ function loadSettings( type, userSettings ) {
 
 	return settings;
 }
+
+
+
+/**
+ * Match the regex for the type 'words'
+ * @param text
+ * @param regex
+ * @returns {Array|{index: number, input: string}}
+ */
+function matchWords( text, regex, settings ) {
+	text = flow(
+		stripTags.bind( this, settings ),
+		stripHTMLComments.bind( this, settings ),
+		stripShortcodes.bind( this, settings ),
+		stripSpaces.bind( this, settings ),
+		stripHTMLEntities.bind( this, settings ),
+		stripConnectors.bind( this, settings ),
+		stripRemovables.bind( this, settings ),
+	)( text );
+	text = text + '\n';
+	return text.match( regex );
+}
+
+/**
+ * Match the regex for either 'characters_excluding_spaces' or 'characters_including_spaces'
+ * @param text
+ * @param regex
+ * @returns {Array|{index: number, input: string}}
+ */
+function matchCharacters( text, regex, settings ) {
+	text = flow(
+		stripTags.bind( this, settings ),
+		stripHTMLComments.bind( this, settings ),
+		stripShortcodes.bind( this, settings ),
+		stripSpaces.bind( this, settings ),
+		transposeAstralsToCountableChar.bind( this, settings ),
+		transposeHTMLEntitiesToCountableChars.bind( this, settings ),
+	)( text );
+	text = text + '\n';
+	return text.match( regex );
+}
+
 /**
  * Count some words.
  *
@@ -45,68 +87,16 @@ function loadSettings( type, userSettings ) {
  *
  * @returns {Number}
  */
-export const WordCounter = {
 
-	settings: null,
-
-	count: function count( text, type, userSettings ) {
-		this.settings = loadSettings( type, userSettings );
-		if ( text ) {
-			let matchRegExp = this.settings[type + 'RegExp'];
-			if ('words' === this.settings.type) {
-				return this.matchWords( text, matchRegExp ).length;
-			} else {
-				return this.matchCharacters(text, matchRegExp).length;
-			}
+export function count( text, type, userSettings ) {
+	const settings = loadSettings( type, userSettings );
+	if ( text ) {
+		let matchRegExp = settings[type + 'RegExp'];
+		if ('words' === settings.type) {
+			return matchWords( text, matchRegExp, settings ).length;
+		} else {
+			return matchCharacters( text, matchRegExp, settings ).length;
 		}
-	},
-
-	/**
-	 * Match the regex for the type 'words'
-	 * @param text
-	 * @param regex
-	 * @returns {Array|{index: number, input: string}}
-	 */
-	matchWords: function( text, regex ) {
-		text = flow(
-			this.stripTags,
-			this.stripHTMLComments,
-			this.stripShortcodes,
-			this.stripSpaces,
-			this.stripHTMLEntities,
-			this.stripConnectors,
-			this.stripRemovables,
-		).bind(this)( text );
-		text = text + '\n';
-		return text.match( regex );
-	},
-
-	/**
-	 * Match the regex for either 'characters_excluding_spaces' or 'characters_including_spaces'
-	 * @param text
-	 * @param regex
-	 * @returns {Array|{index: number, input: string}}
-	 */
-	matchCharacters: function( text, regex ) {
-		text = flow(
-			this.stripTags,
-			this.stripHTMLComments,
-			this.stripShortcodes,
-			this.stripSpaces,
-			this.transposeAstralsToCountableChar,
-			this.transposeHTMLEntitiesToCountableChars,
-		).bind(this)( text );
-		text = text + '\n';
-		return text.match( regex );
-	},
-	stripHTMLEntities: stripHTMLEntities,
-	stripConnectors: stripConnectors,
-	stripRemovables: stripRemovables,
-	stripHTMLComments: stripHTMLComments,
-	stripShortcodes: stripShortcodes,
-	stripSpaces: stripSpaces,
-	transposeHTMLEntitiesToCountableChars: transposeHTMLEntitiesToCountableChars,
-	transposeAstralsToCountableChar: transposeAstralsToCountableChar,
-	stripTags: stripTags,
-};
+	}
+}
 

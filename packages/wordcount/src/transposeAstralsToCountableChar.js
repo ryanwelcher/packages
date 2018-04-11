@@ -4,9 +4,9 @@
  * @param {Object} settings
  * @returns {string|*|XML|void}
  */
-export default function ( text ) {
-	if ( this.settings.astralRegExp ) {
-		return text.replace( this.settings.astralRegExp, 'a');
+export default function ( settings, text ) {
+	if ( settings.astralRegExp ) {
+		return text.replace( settings.astralRegExp, 'a');
 	}
 	return text;
 }

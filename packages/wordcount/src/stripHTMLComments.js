@@ -4,6 +4,9 @@
  * @param {Object} settings
  * @returns {string|*|XML|void}
  */
-export default function ( text ) {
-	return text.replace( this.settings.HTMLcommentRegExp , '' );
+export default function ( settings, text ) {
+	if ( settings.HTMLcommentRegExp ) {
+		return text.replace( settings.HTMLcommentRegExp , '' );
+	}
+	return text;
 }

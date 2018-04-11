@@ -4,6 +4,9 @@
  * @param {Object} settings
  * @returns {string|*|XML|void}
  */
-export default function ( text ) {
-	return text.replace( this.settings.connectorRegExp, ' ' );
+export default function ( settings, text ) {
+	if ( settings.connectorRegExp ) {
+		return text.replace(settings.connectorRegExp, ' ');
+	}
+	return text;
 }
