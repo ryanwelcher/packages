@@ -20,7 +20,7 @@ import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCoun
  * @returns {void|Object|*}
  */
 function loadSettings( type, userSettings ) {
-	let settings = extend( defaultSettings, userSettings  );
+	const settings = extend( defaultSettings, userSettings  );
 
 	settings.shortcodes = settings.l10n.shortcodes || {};
 
