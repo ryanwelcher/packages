@@ -39,8 +39,9 @@ function loadSettings( type, userSettings ) {
 /**
  * Match the regex for the type 'words'
  *
- * @param {string} text  The text being processed
- * @param {string} regex The regular expression pattern being matched
+ * @param {string} text     The text being processed
+ * @param {string} regex    The regular expression pattern being matched
+ * @param {object} settings Settings object containing regular expressions for each strip function
  *
  * @return {Array|{index: number, input: string}} The matched string.
  */
@@ -61,8 +62,9 @@ function matchWords( text, regex, settings ) {
 /**
  * Match the regex for either 'characters_excluding_spaces' or 'characters_including_spaces'
  *
- * @param text  The text being processed
- * @param regex The regular expression pattern being matched
+ * @param {string} text     The text being processed
+ * @param {string} regex    The regular expression pattern being matched
+ * @param {object} settings Settings object containing regular expressions for each strip function
  *
  * @return {Array|{index: number, input: string}} The matched string.
  */
