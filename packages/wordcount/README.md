@@ -7,11 +7,20 @@ A utility to count words
 Install the module
 
 ```bash
-npm install @wordpress/wordcount@next --save
+npm install @wordpress/wordcount--save
 ```
 
-## Usage
 
+## Accepted Paramaters
 ```JS
-import {WordCounter} from '@wordpress/wordcount';
-const count = WordCounter.count( 'Words to count', 'words', {});
+count( text, type, userSettings )
+````
+count accepts three parameters:
+1. text: A string containing the words to be counted
+2. type: A string that represents the type of count. The current implementation accepts only the string 'words'. Any other string that is passed will result in a character count.
+3. userSettings: An object that contains the list of regular expressions that will be used to count. See defaultSettings.js for the defaults.
+
+## Usage
+```JS
+import {count} from '@wordpress/wordcount';
+const numberOfWords = count( 'Words to count', 'words', {} )
