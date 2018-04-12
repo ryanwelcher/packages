@@ -7,7 +7,7 @@ A utility to count words
 Install the module
 
 ```bash
-npm install @wordpress/wordcount--save
+npm install @wordpress/wordcount --save
 ```
 
 
@@ -22,5 +22,5 @@ count accepts three parameters:
 
 ## Usage
 ```JS
-import {count} from '@wordpress/wordcount';
+import { count } from '@wordpress/wordcount';
 const numberOfWords = count( 'Words to count', 'words', {} )
