@@ -1,4 +1,4 @@
-import { extend, flow  } from 'lodash';
+import { extend, flow } from 'lodash';
 import { defaultSettings } from './defaultSettings'
 import stripTags from './stripTags';
 import transposeAstralsToCountableChar from './transposeAstralsToCountableChar';
@@ -10,14 +10,13 @@ import stripShortcodes from './stripShortcodes';
 import stripSpaces from './stripSpaces';
 import transposeHTMLEntitiesToCountableChars from './transposeHTMLEntitiesToCountableChars';
 
-
-
 /**
  * Private function to manage the settings.
  *
- * @param type
- * @param userSettings
- * @returns {void|Object|*}
+ * @param {string} type         The type of count to be done.
+ * @param {Object} userSettings Custom settings for the count.
+ *
+ * @return {void|Object|*} The combined settings object to be used.
  */
 function loadSettings( type, userSettings ) {
 	const settings = extend( defaultSettings, userSettings  );
@@ -37,13 +36,13 @@ function loadSettings( type, userSettings ) {
 	return settings;
 }
 
-
-
 /**
  * Match the regex for the type 'words'
- * @param text
- * @param regex
- * @returns {Array|{index: number, input: string}}
+ *
+ * @param {string} text  The text being processed
+ * @param {string} regex The regular expression pattern being matched
+ *
+ * @return {Array|{index: number, input: string}} The matched string.
  */
 function matchWords( text, regex, settings ) {
 	text = flow(
@@ -61,9 +60,11 @@ function matchWords( text, regex, settings ) {
 
 /**
  * Match the regex for either 'characters_excluding_spaces' or 'characters_including_spaces'
- * @param text
- * @param regex
- * @returns {Array|{index: number, input: string}}
+ *
+ * @param text  The text being processed
+ * @param regex The regular expression pattern being matched
+ *
+ * @return {Array|{index: number, input: string}} The matched string.
  */
 function matchCharacters( text, regex, settings ) {
 	text = flow(
@@ -81,11 +82,11 @@ function matchCharacters( text, regex, settings ) {
 /**
  * Count some words.
  *
- * @param {String} text
- * @param {String} type
- * @param {Object}  userSettings
+ * @param {String} text         The text being processed
+ * @param {String} type         The type of count. Accepts ;words', 'characters_excluding_spaces', or 'characters_including_spaces'.
+ * @param {Object} userSettings Custom settings object.
  *
- * @returns {Number}
+ * @return {Number} The word or character count.
  */
 
 export function count( text, type, userSettings ) {
@@ -99,4 +100,3 @@ export function count( text, type, userSettings ) {
 		}
 	}
 }
-

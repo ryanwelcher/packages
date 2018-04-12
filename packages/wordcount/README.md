@@ -16,8 +16,8 @@ npm install @wordpress/wordcount--save
 count( text, type, userSettings )
 ````
 count accepts three parameters:
-1. text: A string containing the words to be counted
-2. type: A string that represents the type of count. The current implementation accepts only the string 'words'. Any other string that is passed will result in a character count.
+1. text: A string containing the words/characters to be counted.
+2. type: A string that represents the type of count. The current implementation accepts the strings 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
 3. userSettings: An object that contains the list of regular expressions that will be used to count. See defaultSettings.js for the defaults.
 
 ## Usage
