@@ -2,10 +2,8 @@ sudo: false
 language: node_js
 node_js:
   - '8'
-  - '6'
 
 script:
-  - lerna bootstrap && npm run build
   - npm run test:coverage-ci
 
 notifications:

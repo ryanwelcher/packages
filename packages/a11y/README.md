@@ -7,7 +7,7 @@ Collection of JS modules for enhancing accessibility.
 Install the module
 
 ```bash
-npm install @wordpress/a11y@next --save
+npm install @wordpress/a11y --save
 ```
 
 ## speak
@@ -49,3 +49,5 @@ For context I'll quote [this article on WordPress.org](https://make.wordpress.or
 ## Browser support
 
 See https://make.wordpress.org/design/handbook/design-guide/browser-support/
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

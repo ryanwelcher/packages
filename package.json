@@ -1,34 +1,46 @@
 {
-  "devDependencies": {
-    "babel-core": "^6.25.0",
-    "babel-plugin-transform-object-rest-spread": "^6.23.0",
-    "babel-preset-env": "^1.5.2",
-    "chalk": "^2.0.1",
-    "codecov": "^2.2.0",
-    "glob": "^7.1.2",
-    "jest": "^20.0.4",
-    "lerna": "^2.0.0",
-    "mkdirp": "^0.5.1",
-    "rimraf": "^2.6.1",
-    "babel-loader": "^7.1.1"
-  },
-  "jest": {
-    "collectCoverageFrom": [
-      "packages/*/**/*.js"
-    ],
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/.*/build.*"
-    ],
-    "coverageDirectory": "coverage"
-  },
-  "scripts": {
-    "build-clean": "rimraf ./packages/*/build ./packages/*/build-module",
-    "build": "node ./scripts/build.js",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
-    "test:coverage-ci": "jest --coverage && codecov",
-    "test:watch": "jest --watch",
-    "publish:dev": "npm run build-clean && npm run build && lerna publish --npm-tag next",
-    "publish:prod": "npm run build-clean && npm run build && lerna publish"
-  }
+	"license": "GPL-2.0-or-later",
+	"engines": {
+		"node": ">=8.0.0",
+		"npm": ">=5.0.0"
+	},
+	"devDependencies": {
+		"babel-core": "^6.26.0",
+		"benchmark": "^2.1.4",
+		"chalk": "^2.0.1",
+		"check-node-version": "^3.1.1",
+		"codecov": "^2.2.0",
+		"glob": "^7.1.2",
+		"lerna": "^2.9.0",
+		"mkdirp": "^0.5.1",
+		"npm-run-all": "^4.1.2",
+		"path-type": "^3.0.0",
+		"rimraf": "^2.6.1",
+		"symlink-or-copy": "^1.2.0"
+	},
+	"babel": {
+		"presets": "@wordpress/default"
+	},
+	"jest": {
+		"collectCoverageFrom": [
+			"packages/*/**/*.js"
+		],
+		"preset": "@wordpress/jest-preset-default"
+	},
+	"scripts": {
+		"build-clean": "rimraf ./packages/*/build ./packages/*/build-module",
+		"prebuild": "npm-run-all check-engines build-clean",
+		"build": "node ./scripts/build.js",
+		"check-engines": "check-node-version --package",
+		"create-symlinks": "node ./scripts/create-symlinks.js",
+		"lerna-bootstrap": "lerna bootstrap --hoist",
+		"postinstall": "npm-run-all lerna-bootstrap create-symlinks build",
+		"test": "wp-scripts test-unit-js",
+		"test:coverage": "npm run test -- --coverage",
+		"test:coverage-ci": "npm run test -- --coverage && codecov",
+		"test:watch": "npm run test -- --watch",
+		"publish:check": "npm run build && lerna updated",
+		"publish:dev": "npm run build && lerna publish --npm-tag next",
+		"publish:prod": "npm run build && lerna publish"
+	}
 }
