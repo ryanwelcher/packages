@@ -94,8 +94,8 @@ function matchCharacters( text, regex, settings ) {
 export function count( text, type, userSettings ) {
 	const settings = loadSettings( type, userSettings );
 	if ( text ) {
-		let matchRegExp = settings[type + 'RegExp'];
-		if ('words' === settings.type) {
+		let matchRegExp = settings[ type + 'RegExp' ];
+		if ( 'words' === settings.type ) {
 			return matchWords( text, matchRegExp, settings ).length;
 		} else {
 			return matchCharacters( text, matchRegExp, settings ).length;
