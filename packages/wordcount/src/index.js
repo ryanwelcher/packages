@@ -98,9 +98,7 @@ export function count( text, type, userSettings ) {
 		const results = ( 'words' === settings.type ) ?
 			matchWords( text, matchRegExp, settings ) :
 			matchCharacters( text, matchRegExp, settings );
-		if ( results ) {
-			return results.length;
-		}
-		return 0;
+
+		return results ? results.length : 0;
 	}
 }
