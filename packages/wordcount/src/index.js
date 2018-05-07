@@ -93,13 +93,14 @@ function matchCharacters( text, regex, settings ) {
 
 export function count( text, type, userSettings ) {
 	const settings = loadSettings( type, userSettings );
-	let returnData = 0;
 	if ( text ) {
 		let matchRegExp = settings[ type + 'RegExp' ];
-		const results = ( 'words' === settings.type ) ? matchWords( text, matchRegExp, settings ) : matchCharacters( text, matchRegExp, settings );
+		const results = ( 'words' === settings.type ) ?
+			matchWords( text, matchRegExp, settings ) :
+			matchCharacters( text, matchRegExp, settings );
 		if ( results ) {
-			returnData = results.length;
+			return results.length;
 		}
-		return returnData;
+		return 0;
 	}
 }
